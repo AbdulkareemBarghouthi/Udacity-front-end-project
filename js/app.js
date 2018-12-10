@@ -144,6 +144,11 @@ var ViewModel = function() {
             if (this.location.includes(this.input)) {
                 self.result(locations[i]);
                 self.resultLocations.push(self.result());
+                allMarkers.forEach(function(item) {
+                    if (item.title == locations[i].title) {
+                        item.setMap(map);
+                    }
+                });
             }
         }
     }

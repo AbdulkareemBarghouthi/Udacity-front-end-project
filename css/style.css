@@ -1,5 +1,56 @@
-#map {
+* {
+    color: white;
+}
+
+input {
+    color: black;
+}
+
+.container {
     height: 100%;
+    display: grid;
+    grid-template-columns: 25% 75%;
+}
+
+#filter {
+    background-color: #dfe4ea;
+    grid-column: 1/2;
+}
+
+button {
+    background-color: black;
+}
+
+#filterButton {
+    height: 35px;
+    width: 50px;
+}
+
+#listInput {
+    position: relative;
+    top: 10%;
+    width: 80%;
+    height: 30px;
+}
+
+#resultList {
+    position: relative;
+    list-style-type: none;
+    font-size: 30px;
+    margin: 0;
+    top: 5px;
+    left: -30px;
+}
+
+li {
+    margin-bottom: 5px;
+    color: mediumvioletred;
+}
+
+#map {
+    grid-column: 2/3;
+    height: 100%;
+    width: 100%;
 }
 
 html,

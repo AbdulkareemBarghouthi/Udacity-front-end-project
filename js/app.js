@@ -153,17 +153,27 @@ var ViewModel = function() {
         }
     }
 
-    self.getWikipediaArticles = function(data) {
+    self.getExtraInfo = function(data) {
         var that = this;
         self.checkVisibilty(true);
         helperObject.getWikiArticles(data.title);
         helperObject.getFourSquareInfo(data);
 
-        // Deal with markers
+        // Add Animation to markers and streetView pano in the extraInfo div
         self.marker;
         allMarkers.forEach(function(item) {
             if (item.title == data.title) {
                 self.marker = item;
+                var panorama = new google.maps.StreetViewPanorama(
+                    document.getElementById('pano'), {
+                        position: item.position,
+                        pov: {
+                            heading: 10,
+                            pitch: 5
+                        }
+                    });
+                console.dir(panorama);
+                map.setStreetView(panorama);
             }
             item.setAnimation(null);
         });

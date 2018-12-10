@@ -75,3 +75,8 @@ li {
     height: 30px;
     left: 90%;
 }
+
+#pano {
+    height: 300px;
+    width: 300px;
+}

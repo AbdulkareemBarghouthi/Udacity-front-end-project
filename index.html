@@ -15,7 +15,7 @@
             <span>Search for Restaurants in fort LaunderDale</span>
             <input type="text" id="listInput" placeholder="Search for locations" data-bind="event: {'keyup': filterFunction},textInput: userInput">
             <ul id="resultList" data-bind="foreach: resultLocations">
-                <li data-bind="text: title, click: $parent.getWikipediaArticles.bind($data)"></li>
+                <li data-bind="text: title, click: $parent.getExtraInfo.bind($data)"></li>
             </ul>
         </div>
         <div id="map"></div>
@@ -28,6 +28,8 @@
             <h3>FourSquare</h3>
             <ul id="fourSquareList">
             </ul>
+            <div id="pano">
+            </div>
             <img id="closeIcon" src="https://cdn3.iconfinder.com/data/icons/status/100/close_1-512.png" data-bind="click: hideElement">
         </div>
     </div>

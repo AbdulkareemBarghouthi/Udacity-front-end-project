@@ -23,21 +23,42 @@ var helperObject = {
                 article.innerHTML = "<a href=http://en.wikipedia.org/wiki/" + response[0] + ">" + response[0] + "</a>";
 
                 cardList.appendChild(article);
-                return true;
             }
         });
     },
-    getYelpReviews: function(lat, lng) {
-        var yelpUrl = "https://api.yelp.com/v3/businesses/search?latitude=" + lat + "&longitude=" + lng;
+    getFourSquareInfo: function(data) {
+        var self = this;
         $.ajax({
-            url: yelpUrl,
-            headers: {
-                'Authorization': 'Bearer xxxxxxxxxxxxx',
-            },
-            method: 'GET',
+            client_id: "0QVUHV412GGI1M4DCDYHSXK4LCYVASHMILEBMBR000RZ4TSR",
+            client_secret: "GT3HKHHLLUP3R5JQQLUNF1R2YLBU0JLCEHUFWN4IHGL01AGI",
+            url: "https://api.foursquare.com/v2/venues/search?client_id=0QVUHV412GGI1M4DCDYHSXK4LCYVASHMILEBMBR000RZ4TSR&client_secret=GT3HKHHLLUP3R5JQQLUNF1R2YLBU0JLCEHUFWN4IHGL01AGI&v=20180323&limit=1&ll=" + data.location.lat + "," + data.location.lng + "&query=" + data.title.replace(" ", "%20"),
             dataType: "jsonp",
+            method: "GET",
             success: function(response) {
                 console.log(response);
+                var fsList = document.getElementById("fourSquareList");
+                var container = document.getElementById("extraInfo");
+                while (fsList.firstChild) {
+                    fsList.removeChild(fsList.firstChild);
+                }
+
+                container.removeChild(container.lastChild);
+                var address = response["response"].venues[0].location.formattedAddress[0];
+                var category = response["response"].venues[0].categories[0].name;
+                var iconSetup = response["response"].venues[0].categories[0].icon;
+                var icon = iconSetup.prefix + "64" + iconSetup.suffix;
+                var city = response["response"].venues[0].location.formattedAddress[1];
+
+                var fsItem = document.createElement("li");
+                var fscategoryItem = document.createElement("li");
+                var fsIcon = document.createElement("img");
+
+                fscategoryItem.innerHTML = category;
+                fsItem.innerHTML = address;
+                fsIcon.setAttribute("src", icon);
+                fsList.appendChild(fsItem);
+                fsList.appendChild(fscategoryItem);
+                container.appendChild(fsIcon);
             }
         });
     }
@@ -51,6 +72,7 @@ var map;
 var allMarkers = [];
 
 function initMap() {
+    allMarkers = [];
     map = new google.maps.Map(document.getElementById('map'), {
         center: {
             lat: 26.13804,
@@ -95,16 +117,24 @@ function initializeInfoWindows(marker, infoWindow) {
 var ViewModel = function() {
     var self = this;
 
+    self.checkVisibilty = ko.observable(false);
+
     // Storing the full location of the site
     self.userInput = ko.observable("");
     self.listLocations = ko.observableArray([]);
     locations.forEach(function(item) {
-        self.listLocations.push(item.title);
+        self.listLocations.push(item);
     });
+
     self.resultLocations = ko.observableArray(self.listLocations());
     self.result = ko.observable();
 
     self.filterFunction = function() {
+        self.Markers = ko.observableArray(helperObject.getAllLocations());
+        self.filteredMarkers = ko.observableArray([]);
+        allMarkers.forEach(function(item) {
+            item.setMap(null);
+        });
         if (self.resultLocations().length != 0) {
             self.resultLocations([]);
         }
@@ -112,14 +142,31 @@ var ViewModel = function() {
             this.input = self.userInput().toString().toLowerCase();
             this.location = locations[i].title.toString().toLowerCase();
             if (this.location.includes(this.input)) {
-                self.result(locations[i].title);
+                self.result(locations[i]);
                 self.resultLocations.push(self.result());
             }
         }
     }
 
-    self.getWikipediaArticles = function(title) {
-        helperObject.getWikiArticles(title);
+    self.getWikipediaArticles = function(data) {
+        var that = this;
+        self.checkVisibilty(true);
+        helperObject.getWikiArticles(data.title);
+        helperObject.getFourSquareInfo(data);
+
+        // Deal with markers
+        self.marker;
+        allMarkers.forEach(function(item) {
+            if (item.title == data.title) {
+                self.marker = item;
+            }
+            item.setAnimation(null);
+        });
+        self.marker.setAnimation(google.maps.Animation.BOUNCE);
+    }
+
+    self.hideElement = function() {
+        self.checkVisibilty(false);
     }
 
 }

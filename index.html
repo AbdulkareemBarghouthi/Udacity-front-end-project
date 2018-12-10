@@ -15,18 +15,20 @@
             <span>Search for Restaurants in fort LaunderDale</span>
             <input type="text" id="listInput" placeholder="Search for locations" data-bind="event: {'keyup': filterFunction},textInput: userInput">
             <ul id="resultList" data-bind="foreach: resultLocations">
-                <li data-bind="text: $data, click: $parent.getWikipediaArticles.bind($data.title)"></li>
+                <li data-bind="text: title, click: $parent.getWikipediaArticles.bind($data)"></li>
             </ul>
         </div>
         <div id="map"></div>
-        <div id="extraInfo">
+
+        <div id="extraInfo" data-bind="visible: checkVisibilty">
             <h3 style="text-align: center;"> Additional Information About this Cite </h3>
             <h3>Wikipedia Articles</h3>
             <ul id="wikiList">
             </ul>
-            <h3>Yelp</h3>
-            <ul id="yelpList">
+            <h3>FourSquare</h3>
+            <ul id="fourSquareList">
             </ul>
+            <img id="closeIcon" src="https://cdn3.iconfinder.com/data/icons/status/100/close_1-512.png" data-bind="click: hideElement">
         </div>
     </div>
 

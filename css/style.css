@@ -68,3 +68,10 @@ li {
     width: 30%;
     z-index: 99;
 }
+
+#closeIcon {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    left: 90%;
+}

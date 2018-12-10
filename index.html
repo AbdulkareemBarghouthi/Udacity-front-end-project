@@ -12,15 +12,17 @@
     <div class="container">
         <div id="filter">
             <h3 style="text-align: center;">Welcome To Amman!</h3>
+            <span>Search for places in amman</span>
             <input type="text" id="listInput" placeholder="Search for locations" data-bind="event: {'keyup': filterFunction},textInput: userInput">
-            <button id="filterButton" data-bind="click: filterFunction">Filter</button>
             <ul id="resultList" data-bind="foreach: resultLocations">
                 <li data-bind="text: $data"></li>
             </ul>
         </div>
         <div id="map"></div>
-    </div>
+        <div id="extraInfo">
 
+        </div>
+    </div>
 
     <script src="js/lib/knockout-3.2.0.js"></script>
     <script src="js/Model/locations.js"></script>

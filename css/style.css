@@ -1,13 +1,20 @@
-* {
-    color: white;
+#map {
+    grid-column: 2/3;
+    grid-row: 0/end;
+    height: 100%;
+    width: 100%;
 }
 
-input {
-    color: black;
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 .container {
     height: 100%;
+    widows: 100%;
     display: grid;
     grid-template-columns: 25% 75%;
 }
@@ -21,22 +28,28 @@ button {
     background-color: black;
 }
 
-#filterButton {
-    height: 35px;
-    width: 50px;
+input {
+    color: black;
+}
+
+span {
+    position: relative;
+    left: 7%;
+    font-size: 25px;
+    margin-bottom: 3px;
 }
 
 #listInput {
     position: relative;
     top: 10%;
-    width: 80%;
+    width: 95%;
     height: 30px;
+    left: 5px;
 }
 
 #resultList {
     position: relative;
-    list-style-type: none;
-    font-size: 30px;
+    font-size: 25px;
     margin: 0;
     top: 5px;
     left: -30px;
@@ -47,15 +60,11 @@ li {
     color: mediumvioletred;
 }
 
-#map {
-    grid-column: 2/3;
-    height: 100%;
-    width: 100%;
-}
-
-html,
-body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
+#extraInfo {
+    position: absolute;
+    top: 10px;
+    left: 65%;
+    background-color: antiquewhite;
+    width: 30%;
+    z-index: 99;
 }

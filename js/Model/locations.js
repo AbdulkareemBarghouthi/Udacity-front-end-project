@@ -2,7 +2,7 @@ var locations = [
     { "title": "Alia Restaurant", "location": { lat: 31.949213, lng: 35.892162 } },
     { "title": "Byzantine Oil Press", "location": { lat: 31.944351, lng: 35.891111 } },
     { "title": "Orthodox Sports Club", "location": { lat: 31.947592, lng: 35.896475 } },
-    { "title": "Starbucks Coffee", "location": { lat: 31.942221, lng: 35.889888 } },
+    { "title": "Starbucks Coffee Abdoun", "location": { lat: 31.942221, lng: 35.889888 } },
     { "title": "Embassy of the United States", "location": { lat: 31.945098, lng: 35.880532 } },
     { "title": "Al Khalidi Hospital and Medical Center", "location": { lat: 31.950487, lng: 35.903878 } },
     { "title": "Taj Mall", "location": { lat: 31.941359, lng: 35.888048 } },

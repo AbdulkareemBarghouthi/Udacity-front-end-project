@@ -61,9 +61,9 @@ var ViewModel = function() {
     self.userInput = ko.observable("");
     self.listLocations = ko.observableArray([]);
     locations.forEach(function(item) {
-        self.listLocations.push(item);
+        self.listLocations.push(item.title);
     });
-    self.resultLocations = ko.observableArray(["somethign"]);
+    self.resultLocations = ko.observableArray(self.listLocations());
     self.result = ko.observable();
 
     self.filterFunction = function() {

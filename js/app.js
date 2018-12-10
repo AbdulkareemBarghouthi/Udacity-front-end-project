@@ -1,6 +1,45 @@
-var Controller = {
+var helperObject = {
+    articleList: [],
     getAllLocations: function() {
         return locations;
+    },
+    getWikiArticles: function(title) {
+        $.ajax({
+            url: 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + title + '&format=json&callback=wikiCallback',
+            dataType: "jsonp",
+            success: function(response) {
+                var cardList = document.getElementById("wikiList");
+                var card = document.getElementById("extraInfo");
+                while (cardList.firstChild) {
+                    cardList.removeChild(cardList.firstChild);
+                }
+                var article = document.createElement("li");
+                if (response[2].length == 0 || response[2] == "") {
+                    article.innerHTML = "No wikipedia links available for this restaraunt :/";
+                    cardList.appendChild(article);
+                    return false;
+                };
+
+                article.innerHTML = "<a href=http://en.wikipedia.org/wiki/" + response[0] + ">" + response[0] + "</a>";
+
+                cardList.appendChild(article);
+                return true;
+            }
+        });
+    },
+    getYelpReviews: function(lat, lng) {
+        var yelpUrl = "https://api.yelp.com/v3/businesses/search?latitude=" + lat + "&longitude=" + lng;
+        $.ajax({
+            url: yelpUrl,
+            headers: {
+                'Authorization': 'Bearer xxxxxxxxxxxxx',
+            },
+            method: 'GET',
+            dataType: "jsonp",
+            success: function(response) {
+                console.log(response);
+            }
+        });
     }
 }
 
@@ -14,16 +53,14 @@ var allMarkers = [];
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: {
-            lat: 31.945367,
-            lng: 35.928372
+            lat: 26.13804,
+            lng: -80.164247
         },
         zoom: 13
     });
-    var markers = Controller.getAllLocations();
+    var markers = helperObject.getAllLocations();
 
-    var infoWindow = new google.maps.InfoWindow({
-        content: "Hey there"
-    });
+    var infoWindow = new google.maps.InfoWindow();
 
     for (var i = 0; i < markers.length; i++) {
         var marker = new google.maps.Marker({
@@ -34,8 +71,7 @@ function initMap() {
         allMarkers.push(marker);
 
         marker.addListener('click', function() {
-            // initializeInfoWindows(this, infoWindow);
-            infoWindow.open(map, this);
+            initializeInfoWindows(this, infoWindow);
         });
 
     }
@@ -51,13 +87,15 @@ function gm_authFailure() {
 // Populate infoWindow
 function initializeInfoWindows(marker, infoWindow) {
     infoWindow.marker = marker;
-    // infoWindow.setContent(marker.title);
+    infoWindow.setContent(marker.title);
     infoWindow.setContent('<div>' + marker.title + '</div>');
     infoWindow.open(map, marker);
 }
 
 var ViewModel = function() {
     var self = this;
+
+    // Storing the full location of the site
     self.userInput = ko.observable("");
     self.listLocations = ko.observableArray([]);
     locations.forEach(function(item) {
@@ -79,5 +117,10 @@ var ViewModel = function() {
             }
         }
     }
+
+    self.getWikipediaArticles = function(title) {
+        helperObject.getWikiArticles(title);
+    }
+
 }
 ko.applyBindings(new ViewModel());

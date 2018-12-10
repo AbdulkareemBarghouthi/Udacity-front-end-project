@@ -12,7 +12,7 @@
     <div class="container">
         <div id="filter">
             <h3 style="text-align: center;">Welcome To Amman!</h3>
-            <input type="text" id="listInput" placeholder="Search for locations" data-bind="textInput: userInput">
+            <input type="text" id="listInput" placeholder="Search for locations" data-bind="event: {'keyup': filterFunction},textInput: userInput">
             <button id="filterButton" data-bind="click: filterFunction">Filter</button>
             <ul id="resultList" data-bind="foreach: resultLocations">
                 <li data-bind="text: $data"></li>

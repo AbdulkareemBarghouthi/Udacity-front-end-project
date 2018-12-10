@@ -63,18 +63,21 @@ var ViewModel = function() {
     locations.forEach(function(item) {
         self.listLocations.push(item);
     });
-    self.resultLocations = ko.observableArray([]);
+    self.resultLocations = ko.observableArray(["somethign"]);
+    self.result = ko.observable();
 
     self.filterFunction = function() {
-        for (var i = 0; i <= locations.length; i++) {
-            this.input = self.userInput.toString().toLowerCase();
-            this.location = self.locations[i].title;
-            alert("Location: " + this.location + " Input: " + this.input);
+        if (self.resultLocations().length != 0) {
+            self.resultLocations([]);
+        }
+        for (var i = 0; i < locations.length; i++) {
+            this.input = self.userInput().toString().toLowerCase();
+            this.location = locations[i].title.toString().toLowerCase();
             if (this.location.includes(this.input)) {
-                self.resultLocations.push(listLocations[i].title);
+                self.result(locations[i].title);
+                self.resultLocations.push(self.result());
             }
         }
     }
-
 }
-ko.applyBindings(new ViewModel);
+ko.applyBindings(new ViewModel());

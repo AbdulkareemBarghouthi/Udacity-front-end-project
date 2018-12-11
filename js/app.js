@@ -1,3 +1,4 @@
+// Here's an object that provides helper functions acting closely like a controller but i like to consider it as a middleware
 var helperObject = {
     articleList: [],
     getAllLocations: function() {
@@ -24,6 +25,8 @@ var helperObject = {
 
                 cardList.appendChild(article);
             }
+        }).fail(function() {
+            alert("Something went wrong try again later :/");
         });
     },
     getFourSquareInfo: function(data) {
@@ -41,7 +44,11 @@ var helperObject = {
                 while (fsList.firstChild) {
                     fsList.removeChild(fsList.firstChild);
                 }
-
+                if (response.length == 0) {
+                    var error = document.createElement("p");
+                    error.innerHTML = "No forsquare articles available :/"
+                    fsList.appendChild(error);
+                }
                 container.removeChild(container.lastChild);
                 var address = response["response"].venues[0].location.formattedAddress[0];
                 var category = response["response"].venues[0].categories[0].name;
@@ -60,7 +67,39 @@ var helperObject = {
                 fsList.appendChild(fscategoryItem);
                 container.appendChild(fsIcon);
             }
+        }).fail(function() {
+            alert("Something went wrong try again later :/");
         });
+    },
+    getDirections: function(data) {
+        var self = this;
+        var success;
+        var directionService = new google.maps.DirectionsService();
+        var directions = {
+            origin: map.center,
+            destination: data.position,
+            travelMode: google.maps.DirectionsTravelMode.DRIVING,
+            unitSystem: google.maps.UnitSystem.METRIC
+        };
+        directionService.route(
+            directions,
+            function(response, status) {
+                if (status == google.maps.DirectionsStatus.OK) {
+                    new google.maps.DirectionsRenderer({
+                        map: map,
+                        directions: response
+                    });
+                    success = response["routes"][0]["legs"];
+                    console.dir(success);
+                    var infoWindow = new google.maps.InfoWindow();
+                    var infoWindowContent = "<h5>here is the route to your location</h5><br>" +
+                        "Restaurant is this far away: " + success[0]["distance"].text + " And it will approximately take: " +
+                        success[0]["duration"].text;
+                    infoWindow.setContent(infoWindowContent);
+                    infoWindow.open(map, data);
+                }
+            }
+        )
     }
 }
 
@@ -93,7 +132,7 @@ function initMap() {
         allMarkers.push(marker);
 
         marker.addListener('click', function() {
-            initializeInfoWindows(this, infoWindow);
+            helperObject.getDirections(this)
         });
 
     }
@@ -106,13 +145,7 @@ function gm_authFailure() {
     alert("API authentication error, We promise we'll fix this as soon as we can :)");
 }
 
-// Populate infoWindow
-function initializeInfoWindows(marker, infoWindow) {
-    infoWindow.marker = marker;
-    infoWindow.setContent(marker.title);
-    infoWindow.setContent('<div>' + marker.title + '</div>');
-    infoWindow.open(map, marker);
-}
+
 
 var ViewModel = function() {
     var self = this;
@@ -178,6 +211,9 @@ var ViewModel = function() {
             item.setAnimation(null);
         });
         self.marker.setAnimation(google.maps.Animation.BOUNCE);
+
+        // Get directions API
+        helperObject.getDirections(data);
     }
 
     self.hideElement = function() {

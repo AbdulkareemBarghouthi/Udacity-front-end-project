@@ -24,6 +24,7 @@ var helperObject = {
                 article.innerHTML = "<a href=http://en.wikipedia.org/wiki/" + response[0] + ">" + response[0] + "</a>";
 
                 cardList.appendChild(article);
+                return response;
             }
         }).fail(function() {
             alert("Something went wrong try again later :/");
@@ -38,7 +39,6 @@ var helperObject = {
             dataType: "jsonp",
             method: "GET",
             success: function(response) {
-                console.log(response);
                 var fsList = document.getElementById("fourSquareList");
                 var container = document.getElementById("extraInfo");
                 while (fsList.firstChild) {
@@ -132,7 +132,7 @@ function initMap() {
         allMarkers.push(marker);
 
         marker.addListener('click', function() {
-            helperObject.getDirections(this)
+            // helperObject.getDirections(this)
         });
 
     }
@@ -151,7 +151,8 @@ var ViewModel = function() {
     var self = this;
 
     self.checkVisibilty = ko.observable(false);
-
+    self.wikiResult = ko.observableArray([]);
+    self.fourSquareResult = ko.observable();
     // Storing the full location of the site
     self.userInput = ko.observable("");
     self.listLocations = ko.observableArray([]);
@@ -185,13 +186,57 @@ var ViewModel = function() {
             }
         }
     }
+    self.getWikiLinks = function(data) {
+        $.ajax({
+            url: 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + data.title + '&format=json&callback=wikiCallback',
+            dataType: "jsonp",
+            success: function(response) {
+                self.wikiResult([]);
+                if (response[3][0] == undefined) {
+                    self.wikiResult.push({ title: "wikipedia link not found", link: "#" });
+                    self.checkVisibilty(true);
+                    return;
+                }
+                console.dir(response[0]);
+                var content = { title: response[0], link: response[3][0] };
+                self.wikiResult.push(content);
+                self.checkVisibilty(true);
+            }
+        }).fail(function() {
+            alert("Something went wrong while getting wikipedia links");
+        });
+    }
+
+    self.getFoursquareInfo = function(data) {
+        $.ajax({
+            client_id: "0QVUHV412GGI1M4DCDYHSXK4LCYVASHMILEBMBR000RZ4TSR",
+            client_secret: "GT3HKHHLLUP3R5JQQLUNF1R2YLBU0JLCEHUFWN4IHGL01AGI",
+            url: "https://api.foursquare.com/v2/venues/search?client_id=0QVUHV412GGI1M4DCDYHSXK4LCYVASHMILEBMBR000RZ4TSR&client_secret=GT3HKHHLLUP3R5JQQLUNF1R2YLBU0JLCEHUFWN4IHGL01AGI&v=20180323&limit=1&ll=" + data.location.lat + "," + data.location.lng + "&query=" + data.title.replace(" ", "%20"),
+            dataType: "jsonp",
+            method: "GET",
+            success: function(response) {
+                if (!response["response"].venues[0]) {
+                    var result = { address: "We couldn't fetch foursquare data :/", name: "N/A", icon: "#", city: "N/A" }
+                    self.fourSquareResult(result);
+                    return;
+                }
+                var address = response["response"].venues[0].location.formattedAddress[0];
+                var category = response["response"].venues[0].categories[0].name;
+                var iconSetup = response["response"].venues[0].categories[0].icon;
+                var icon = iconSetup.prefix + "64" + iconSetup.suffix;
+                var city = response["response"].venues[0].location.formattedAddress[1];
+                var result = { address: address, name: category, icon: icon, city: city };
+                self.fourSquareResult(result);
+            }
+        }).fail(function() {
+            alert("someshit");
+        });
+    }
 
     self.getExtraInfo = function(data) {
-        var that = this;
-        self.checkVisibilty(true);
-        helperObject.getWikiArticles(data.title);
-        helperObject.getFourSquareInfo(data);
-
+        self.checkVisibilty(false);
+        self.getWikiLinks(data);
+        self.getFoursquareInfo(data);
         // Add Animation to markers and streetView pano in the extraInfo div
         self.marker;
         allMarkers.forEach(function(item) {
@@ -205,8 +250,12 @@ var ViewModel = function() {
                             pitch: 5
                         }
                     });
-                console.dir(panorama);
                 map.setStreetView(panorama);
+                self.marker.addListener("click", function() {
+                    self.checkVisibilty(true);
+                    self.getWikiLinks(data);
+                    self.getFourSquareInfo(data);
+                });
             }
             item.setAnimation(null);
         });

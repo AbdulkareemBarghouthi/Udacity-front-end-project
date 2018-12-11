@@ -23,10 +23,15 @@
         <div id="extraInfo" data-bind="visible: checkVisibilty">
             <h3 style="text-align: center;"> Additional Information About this Cite </h3>
             <h3>Wikipedia Articles</h3>
-            <ul id="wikiList">
+            <ul id="wikiList" data-bind="foreach: wikiResult">
+                <a id="wikiItem" data-bind="text: $data.title, attr: {href: $data.link}"></a>
             </ul>
             <h3>FourSquare</h3>
-            <ul id="fourSquareList">
+            <ul id="fourSquareList" data-bind="with: fourSquareResult">
+                <li id="fourSqaureItem" data-bind="text: address"></li>
+                <li id="fourSqaureItem" data-bind="text: name"></li>
+                <li id="fourSqaureItem" data-bind="text: city"></li>
+                <img data-bind="attr: {src: icon}">
             </ul>
             <div id="pano">
             </div>

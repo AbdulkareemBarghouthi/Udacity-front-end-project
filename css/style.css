@@ -80,3 +80,8 @@ li {
     height: 300px;
     width: 300px;
 }
+
+#wikiItem {
+    text-decoration: none;
+    color: black;
+}

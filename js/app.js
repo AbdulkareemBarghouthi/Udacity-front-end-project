@@ -146,7 +146,7 @@ function gm_authFailure() {
 }
 
 
-
+// ViewModel for knockoutjs
 var ViewModel = function() {
     var self = this;
 

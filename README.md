@@ -10,16 +10,21 @@ Why? Because i made it about locations of restaurant so you can check which rest
 This project was implemented using vanilla js, knockoutjs for mvvm and UI bindings and jquery's function AJAX to request API's asynchronously. This was for the functionality of the website, as for the map i used google maps api. 
 
 # How to run this code
-1- First off, you need api key for google maps api here's are steps to obtain your api key
+1- First off, Clone the project's repository from:
+[https://github.com/AbdulkareemBarghouthi/Udacity-front-end-project]
+2- First off, you need api key for google maps api here's are steps to obtain your api key
 [https://developers.google.com/maps/documentation/javascript/get-api-key]
-2- After you have  obtained an API key go to your dashboard and add the following
+3- After you have  obtained an API key go to your dashboard and add the following
     A- Javascript Maps API
     B- Places API
     C- Directions API 
     D- StreetView Image API
-
-3- After you're all set, run the code and the map should show you the markers.
-4- Here are additional api keys need
+4- Go to foursquare create an account and obtain client secret and api key
+[https://developer.foursquare.com/]
+5- now Run the code and place your api in index.html in the url of google maps "key='yourApiKey'
+6- now in app.js ctrl f and look for client_secret and client_id and replace your foursquare keys
+7- After you're all set, run the code and the map should show you the markers.
+8- Here are additional api keys need
     [https://developer.foursquare.com/docs/api/configuration/authentication](FourSquare)
 
 # API's Used

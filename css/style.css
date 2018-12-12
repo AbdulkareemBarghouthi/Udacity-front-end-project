@@ -85,3 +85,7 @@ li {
     text-decoration: none;
     color: black;
 }
+
+#resultItem:hover {
+    background-color: aquamarine;
+}

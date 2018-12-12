@@ -15,7 +15,8 @@
             <span>Search for Restaurants in fort LaunderDale</span>
             <input type="text" id="listInput" placeholder="Search for locations" data-bind="event: {'keyup': filterFunction},textInput: userInput">
             <ul id="resultList" data-bind="foreach: resultLocations">
-                <li data-bind="text: title, click: $parent.getExtraInfo.bind($data)"></li>
+                <li id="resultItem" data-bind="text: title, click: $parent.getExtraInfo.bind($data)"></li>
+                <button style="background-color: white;" data-bind="click: $parent.getRoute">Get Route to this restaurant</button>
             </ul>
         </div>
         <div id="map"></div>
@@ -33,6 +34,7 @@
                 <li id="fourSqaureItem" data-bind="text: city"></li>
                 <img data-bind="attr: {src: icon}">
             </ul>
+            <div id="pano"></div>
             <img id="closeIcon" src="https://cdn3.iconfinder.com/data/icons/status/100/close_1-512.png" data-bind="click: hideElement">
         </div>
     </div>
@@ -41,7 +43,7 @@
     <script src="js/Model/locations.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="js/app.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCXK3w_4TrqOrY1M9ii--TM-U_9Q9r8Ar4&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCXK3w_4TrqOrY1M9ii--TM-U_9Q9r8Ar4&callback=initMap" async defer onerror="google_error_message()"></script>
 </body>
 
 </html>

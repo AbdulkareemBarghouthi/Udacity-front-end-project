@@ -11,7 +11,7 @@ var helperObject = {
         var directionService = new google.maps.DirectionsService();
         var directions = {
             origin: map.center,
-            destination: data.position,
+            destination: data.location,
             travelMode: google.maps.DirectionsTravelMode.DRIVING,
             unitSystem: google.maps.UnitSystem.METRIC
         };
@@ -19,17 +19,14 @@ var helperObject = {
             directions,
             function(response, status) {
                 if (status == google.maps.DirectionsStatus.OK) {
+
                     new google.maps.DirectionsRenderer({
                         map: map,
                         directions: response
                     });
-                    success = response["routes"][0]["legs"];
-                    var infoWindow = new google.maps.InfoWindow();
-                    console.dir(success);
-                    return "<h5>here is the route to your location</h5><br>" +
-                        "Restaurant is this far away: " + success[0]["distance"].text + " And it will approximately take: " +
-                        success[0]["duration"].text;
-
+                    console.dir(response);
+                } else {
+                    alert("We couldn't get the route to your location, we'll fix that as soon as we can!");
                 }
             }
         )
@@ -57,7 +54,8 @@ function initMap() {
         var marker = new google.maps.Marker({
             position: markers[i].location,
             title: markers[i].title,
-            map: map
+            map: map,
+            animation: null
         });
         allMarkers.push(marker);
         var infowindow = new google.maps.InfoWindow();
@@ -73,8 +71,6 @@ function populateInfoWindow(marker, infowindow) {
     var self = this;
     var markerPosition = marker.getPosition();
     var myUrl = "https://api.foursquare.com/v2/venues/search?client_id=0QVUHV412GGI1M4DCDYHSXK4LCYVASHMILEBMBR000RZ4TSR&client_secret=GT3HKHHLLUP3R5JQQLUNF1R2YLBU0JLCEHUFWN4IHGL01AGI&v=20180323&limit=1&ll=" + markerPosition.lat().toString() + "," + markerPosition.lng().toString() + "&query=" + marker.title.split(" ").join("%20");
-    console.log(myUrl);
-    console.log(marker.title.toString());
     $.ajax({
         client_id: "0QVUHV412GGI1M4DCDYHSXK4LCYVASHMILEBMBR000RZ4TSR",
         client_secret: "GT3HKHHLLUP3R5JQQLUNF1R2YLBU0JLCEHUFWN4IHGL01AGI",
@@ -82,6 +78,7 @@ function populateInfoWindow(marker, infowindow) {
         dataType: "jsonp",
         method: "GET",
         success: function(response) {
+            console.dir(response);
             if (!response["response"].venues[0]) {
                 infowindow.setContent("We couldn't fetch any foursquare data for this location :/");
                 return;
@@ -91,21 +88,33 @@ function populateInfoWindow(marker, infowindow) {
             var iconSetup = response["response"].venues[0].categories[0].icon;
             var icon = iconSetup.prefix + "64" + iconSetup.suffix;
             var city = response["response"].venues[0].location.formattedAddress[1];
-            var result = { address: address, name: category, icon: icon, city: city };
-            var content = "<h4>" + category + "</h4>" +
-                "<p>address: " + address + "</p>" + "<p>city: " + city + "</p>";
+            var name = response["response"].venues[0].name;
+            var content = "<div style='background-color:mediumvioletred;'><h4>" + category + "</h4>" + "<h4>" +
+                name + "</h4>" +
+                "<p>address: " + address + "</p>" + "<p>city: " + city + "</p><br>" +
+                "<img src=" + icon + "><br>" +
+                "<p><b>Data collected From foursquare</b></p>" +
+                "</div>";
             infowindow.setContent(content);
+
         }
     }).fail(function() {
         alert("Something was wrong while we were dealing with the foursquare API");
     });
-
+    allMarkers.forEach(function(item) {
+        item.setAnimation(null);
+    });
+    marker.setAnimation(google.maps.Animation.BOUNCE);
 };
 
 // as the google documentation states this function handles any authentication failures with api key
 function gm_authFailure() {
     var ErrorDiv = document.createElement('div');
     alert("API authentication error, We promise we'll fix this as soon as we can :)");
+}
+
+function google_error_message() {
+    alert("We encountered an error while loading the map :/")
 }
 
 
@@ -173,10 +182,11 @@ var ViewModel = function() {
     }
 
     self.getFoursquareInfo = function(data) {
+        var self = this;
+        var myUrl = "https://api.foursquare.com/v2/venues/search?client_id=0QVUHV412GGI1M4DCDYHSXK4LCYVASHMILEBMBR000RZ4TSR&client_secret=GT3HKHHLLUP3R5JQQLUNF1R2YLBU0JLCEHUFWN4IHGL01AGI&v=20180323&limit=3&ll=" + data.location.lat + "," + data.location.lng + "&query=" + data.title.replace(" ", "%20");
+        var venueID = [];
         $.ajax({
-            client_id: "0QVUHV412GGI1M4DCDYHSXK4LCYVASHMILEBMBR000RZ4TSR",
-            client_secret: "GT3HKHHLLUP3R5JQQLUNF1R2YLBU0JLCEHUFWN4IHGL01AGI",
-            url: "https://api.foursquare.com/v2/venues/search?client_id=0QVUHV412GGI1M4DCDYHSXK4LCYVASHMILEBMBR000RZ4TSR&client_secret=GT3HKHHLLUP3R5JQQLUNF1R2YLBU0JLCEHUFWN4IHGL01AGI&v=20180323&limit=1&ll=" + data.location.lat + "," + data.location.lng + "&query=" + data.title.replace(" ", "%20"),
+            url: myUrl,
             dataType: "jsonp",
             method: "GET",
             success: function(response) {
@@ -186,7 +196,7 @@ var ViewModel = function() {
                     return;
                 }
                 var address = response["response"].venues[0].location.formattedAddress[0];
-                var category = response["response"].venues[0].categories[0].name;
+                var category = response["response"].venues[0].name;
                 var iconSetup = response["response"].venues[0].categories[0].icon;
                 var icon = iconSetup.prefix + "64" + iconSetup.suffix;
                 var city = response["response"].venues[0].location.formattedAddress[1];
@@ -196,6 +206,7 @@ var ViewModel = function() {
         }).fail(function() {
             alert("Something was wrong while we were dealing with the foursquare API");
         });
+
     }
 
     self.getExtraInfo = function(data) {
@@ -207,6 +218,14 @@ var ViewModel = function() {
         allMarkers.forEach(function(item) {
             if (item.title == data.title) {
                 self.marker = item;
+                var panorama = new google.maps.StreetViewPanorama(document.getElementById('pano'), {
+                    position: self.marker.getPosition(),
+                    pov: {
+                        heading: 34,
+                        pitch: 10
+                    }
+                });
+                map.setStreetView(panorama);
             }
             item.setAnimation(null);
         });
@@ -216,6 +235,9 @@ var ViewModel = function() {
 
     self.hideElement = function() {
         self.checkVisibilty(false);
+    }
+    self.getRoute = function(data) {
+        helperObject.getDirections(data);
     }
 
 
